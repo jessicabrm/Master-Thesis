@@ -21,4 +21,4 @@ texts. More features developed explicitly for bachelor and master theses should 
 establish a successful AEG system for domain-specific texts. 
 
 
-This repository only includes the code used for the public datasets (https://www.kaggle.com/competitions/asap-aes/data).
+This repository only includes the code for the preprocessing, features and modelling of the public datasets (https://www.kaggle.com/competitions/asap-aes/data).
