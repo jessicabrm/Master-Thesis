@@ -1,0 +1,1126 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(readxl)
+library(ggplot2)
+library(tidyverse)
+library(reshape2)
+library(jtools)
+```
+
+
+
+```{r}
+#thesis_data_preds = read_excel("preds/thesis_data_predictions_tuned_models.xlsx")
+DS1_preds = read_excel("preds/DS1_predictions_tuned_models.xlsx")
+DS2_preds = read_excel("preds/DS2_predictions_tuned_models.xlsx")
+DS2_2_preds = read_excel("preds/DS2_2_predictions_tuned_models.xlsx")
+DS3_preds = read_excel("preds/DS3_predictions_tuned_models.xlsx")
+DS4_preds = read_excel("preds/DS4_predictions_tuned_models.xlsx")
+DS5_preds = read_excel("preds/DS5_predictions_tuned_models.xlsx")
+DS6_preds = read_excel("preds/DS6_predictions_tuned_models.xlsx")
+DS7_preds = read_excel("preds/DS7_predictions_tuned_models.xlsx")
+DS8_preds = read_excel("preds/DS8_predictions_tuned_models.xlsx")
+```
+
+
+# Thesis data
+"""
+```{r}
+#tdp <- thesis_data_preds %>% select(y_test, ends_with("preds")) %>%
+#  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+#         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+#  melt(id.vars = 'y_test', variable.name = "model")
+#tdp
+```
+
+
+```{r}
+#t_nn <- tdp %>% filter(model %in% c("NN")) %>% 
+#  ggplot(aes(value, y_test, alpha = .5)) +
+#  geom_point() +
+#  geom_abline(col = "red") + 
+#  ylim(6.0, 10.0) +
+#  xlim(6.0, 10.0) +
+#  ggtitle("NN") +
+#  ylab("True grade") + 
+#  xlab("Predicted grade") +
+#  theme_apa() +
+#  theme(legend.position = "none") 
+#t_nn
+#ggsave("new_pred_plot/thesis_data_true_vs_preds_NN.png")
+```
+```{r}
+#t_lasso <- tdp %>% filter(model %in% c("Lasso")) %>% 
+#  ggplot(aes(value, y_test, alpha = .5)) +
+#  geom_point() +
+#  geom_abline(col = "red") + 
+#  ylim(6.0, 10.0) +
+#  xlim(6.0, 10.0) +
+#  ggtitle("Lasso") +
+#  ylab("True grade") + 
+#  xlab("Predicted grade") +
+#  theme_apa() +
+#  theme(legend.position = "none") 
+#t_lasso
+#ggsave("new_pred_plot/thesis_data_true_vs_preds_lasso.png")
+```
+
+```{r}
+#t_ridge <- tdp %>% filter(model %in% c("Ridge")) %>% 
+#  ggplot(aes(value, y_test, alpha = .5)) +
+#  geom_point() +
+#  geom_abline(col = "red") + 
+#  ylim(6.0, 10.0) +
+#  xlim(6.0, 10.0) +
+#  ggtitle("Ridge") +
+#  ylab("True grade") + 
+#  xlab("Predicted grade") +
+#  theme_apa() +
+#  theme(legend.position = "none") 
+#t_ridge
+#ggsave("new_pred_plot/thesis_data_true_vs_preds_ridge.png")
+```
+
+```{r}
+#t_lr <- tdp %>% filter(model %in% c("LR")) %>% 
+#  ggplot(aes(value, y_test, alpha = .5)) +
+#  geom_point() +
+#  geom_abline(col = "red") + 
+#  ylim(6.0, 10.0) +
+#  xlim(6.0, 10.0) +
+#  ggtitle("LR") +
+#  ylab("True grade") + 
+#  xlab("Predicted grade") +
+#  theme_apa() +
+#  theme(legend.position = "none") 
+#t_lr
+#ggsave("new_pred_plot/thesis_data_true_vs_preds_lr.png")
+```
+
+```{r}
+#t_rf <- tdp %>% filter(model %in% c("RF")) %>% 
+#  ggplot(aes(value, y_test, alpha = .5)) +
+#  geom_point() +
+#  geom_abline(col = "red") + 
+#  ylim(6.0, 10.0) +
+#  xlim(6.0, 10.0) +
+#  ggtitle("RF") +
+#  ylab("True grade") + 
+#  xlab("Predicted grade") +
+#  theme_apa() +
+#  theme(legend.position = "none") 
+#t_rf
+#ggsave("new_pred_plot/thesis_data_true_vs_preds_rf.png")
+```
+
+```{r}
+#t_rt <- tdp %>% filter(model %in% c("RT")) %>% 
+#  ggplot(aes(value, y_test, alpha = .5)) +
+#  geom_point() +
+#  geom_abline(col = "red") + 
+#  ylim(6.0, 10.0) +
+#  xlim(6.0, 10.0) +
+#  ggtitle("RT") +
+#  ylab("True grade") + 
+#  xlab("Predicted grade") +
+#  theme_apa() +
+#  theme(legend.position = "none") 
+#t_rt
+#ggsave("new_pred_plot/thesis_data_true_vs_preds_rt.png")
+```
+
+```{r}
+#t_ert <- tdp %>% filter(model %in% c("ERT")) %>% 
+#  ggplot(aes(value, y_test, alpha = .5)) +
+#  geom_point() +
+#  geom_abline(col = "red") + 
+#  ylim(6.0, 10.0) +
+#  xlim(6.0, 10.0) +
+#  ggtitle("ERT") +
+#  ylab("True grade") + 
+#  xlab("Predicted grade") +
+#  theme_apa() +
+#  theme(legend.position = "none") 
+#t_ert
+#ggsave("new_pred_plot/thesis_data_true_vs_preds_ert.png")
+```
+
+
+# Hewlett datasets
+
+## DS1
+
+```{r}
+DS1 <- DS1_preds %>% select(y_test, ends_with("preds")) %>%
+  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+  melt(id.vars = 'y_test', variable.name = "model")
+head(DS1)
+```
+
+
+
+```{r}
+DS1 %>% filter(model %in% c("NN")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("NN") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS1_true_vs_preds_NN.png")
+```
+
+```{r}
+DS1 %>% filter(model %in% c("Lasso")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Lasso") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS1_true_vs_preds_Lasso.png")
+```
+
+
+```{r}
+DS1 %>% filter(model %in% c("Ridge")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Ridge") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS1_true_vs_preds_Ridge.png")
+```
+
+```{r}
+DS1 %>% filter(model %in% c("LR")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("LR") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS1_true_vs_preds_LR.png")
+```
+
+```{r}
+DS1 %>% filter(model %in% c("RF")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RF") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS1_true_vs_preds_RF.png")
+```
+
+
+```{r}
+DS1 %>% filter(model %in% c("RT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS1_true_vs_preds_RT.png")
+```
+
+
+
+```{r}
+DS1 %>% filter(model %in% c("ERT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("ERT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS1_true_vs_preds_ERT.png")
+```
+
+
+## DS2A
+
+
+```{r}
+DS2A <- DS2_2_preds %>% select(y_test, ends_with("preds")) %>%
+  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+  melt(id.vars = 'y_test', variable.name = "model")
+head(DS2A)
+```
+
+
+```{r}
+DS2A %>% filter(model %in% c("NN")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("NN") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2A_true_vs_preds_NN.png")
+```
+
+```{r}
+DS2A %>% filter(model %in% c("Lasso")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Lasso") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2A_true_vs_preds_Lasso.png")
+```
+```{r}
+DS2A %>% filter(model %in% c("Ridge")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Ridge") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2A_true_vs_preds_Ridge.png")
+```
+
+```{r}
+DS2A %>% filter(model %in% c("LR")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("LR") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2A_true_vs_preds_LR.png")
+```
+
+
+```{r}
+DS2A %>% filter(model %in% c("RF")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RF") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2A_true_vs_preds_RF.png")
+```
+
+
+```{r}
+DS2A %>% filter(model %in% c("RT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2A_true_vs_preds_RT.png")
+```
+
+
+
+```{r}
+DS2A %>% filter(model %in% c("ERT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("ERT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2A_true_vs_preds_ERT.png")
+```
+
+
+
+### DS2B
+
+```{r}
+DS2B <- DS2_2_preds %>% select(y_test, ends_with("preds")) %>%
+  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+  melt(id.vars = 'y_test', variable.name = "model")
+head(DS2B)
+```
+
+
+
+```{r}
+DS2B %>% filter(model %in% c("NN")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("NN") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2B_true_vs_preds_NN.png")
+```
+
+```{r}
+DS2B %>% filter(model %in% c("Lasso")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Lasso") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2B_true_vs_preds_Lasso.png")
+```
+
+```{r}
+DS2B %>% filter(model %in% c("Ridge")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Ridge") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2B_true_vs_preds_Ridge.png")
+```
+
+```{r}
+DS2B %>% filter(model %in% c("LR")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("LR") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2B_true_vs_preds_LR.png")
+```
+
+```{r}
+DS2B %>% filter(model %in% c("RF")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RF") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2B_true_vs_preds_RF.png")
+```
+
+```{r}
+DS2B %>% filter(model %in% c("RT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2B_true_vs_preds_RT.png")
+```
+
+
+```{r}
+DS2B %>% filter(model %in% c("ERT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("ERT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS2B_true_vs_preds_ERT.png")
+```
+
+
+
+
+### DS3
+
+```{r}
+DS3 <- DS3_preds %>% select(y_test, ends_with("preds")) %>%
+  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+  melt(id.vars = 'y_test', variable.name = "model")
+head(DS3)
+```
+
+
+```{r}
+DS3 %>% filter(model %in% c("NN")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("NN") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS3_true_vs_preds_NN.png")
+```
+
+```{r}
+DS3 %>% filter(model %in% c("Lasso")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Lasso") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS3_true_vs_preds_Lasso.png")
+```
+
+```{r}
+DS3 %>% filter(model %in% c("Ridge")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Ridge") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS3_true_vs_preds_Ridge.png")
+```
+
+```{r}
+DS3 %>% filter(model %in% c("LR")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("LR") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS3_true_vs_preds_LR.png")
+```
+
+```{r}
+DS3 %>% filter(model %in% c("RT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS3_true_vs_preds_RT.png")
+```
+
+```{r}
+DS3 %>% filter(model %in% c("RF")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RF") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS3_true_vs_preds_RF.png")
+```
+
+```{r}
+DS3 %>% filter(model %in% c("ERT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("ERT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS3_true_vs_preds_ERT.png")
+```
+
+
+
+### DS4
+
+```{r}
+DS4 <- DS4_preds %>% select(y_test, ends_with("preds")) %>%
+  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+  melt(id.vars = 'y_test', variable.name = "model")
+head(DS4)
+```
+
+```{r}
+DS4 %>% filter(model %in% c("NN")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("NN") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS4_true_vs_preds_NN.png")
+```
+
+```{r}
+DS4 %>% filter(model %in% c("Lasso")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Lasso") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS4_true_vs_preds_Lasso.png")
+```
+
+```{r}
+DS4 %>% filter(model %in% c("Ridge")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Ridge") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS4_true_vs_preds_Ridge.png")
+```
+
+```{r}
+DS4 %>% filter(model %in% c("LR")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("LR") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS4_true_vs_preds_LR.png")
+```
+
+```{r}
+DS4 %>% filter(model %in% c("RF")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RF") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS4_true_vs_preds_RF.png")
+```
+
+```{r}
+DS4 %>% filter(model %in% c("RT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS4_true_vs_preds_RT.png")
+```
+
+```{r}
+DS4 %>% filter(model %in% c("ERT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("ERT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS4_true_vs_preds_ERT.png")
+```
+
+
+### DS5
+
+```{r}
+DS5 <- DS5_preds %>% select(y_test, ends_with("preds")) %>%
+  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+  melt(id.vars = 'y_test', variable.name = "model")
+head(DS5)
+```
+
+```{r}
+DS5 %>% filter(model %in% c("NN")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("NN") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS5_true_vs_preds_NN.png")
+```
+
+```{r}
+DS5 %>% filter(model %in% c("Lasso")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Lasso") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS5_true_vs_preds_Lasso.png")
+```
+
+```{r}
+DS5 %>% filter(model %in% c("Ridge")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Ridge") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS5_true_vs_preds_Ridge.png")
+```
+
+```{r}
+DS5 %>% filter(model %in% c("LR")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("LR") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS5_true_vs_preds_LR.png")
+```
+
+```{r}
+DS5 %>% filter(model %in% c("RF")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RF") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS5_true_vs_preds_RF.png")
+```
+
+```{r}
+DS5 %>% filter(model %in% c("RT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS5_true_vs_preds_RT.png")
+```
+
+```{r}
+DS5 %>% filter(model %in% c("ERT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("ERT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS5_true_vs_preds_ERT.png")
+```
+
+
+
+
+### DS6
+
+```{r}
+DS6 <- DS6_preds %>% select(y_test, ends_with("preds")) %>%
+  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+  melt(id.vars = 'y_test', variable.name = "model")
+head(DS6)
+```
+
+```{r}
+DS6 %>% filter(model %in% c("NN")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("NN") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS6_true_vs_preds_NN.png")
+```
+
+```{r}
+DS6 %>% filter(model %in% c("Lasso")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Lasso") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS6_true_vs_preds_Lasso.png")
+```
+
+```{r}
+DS6 %>% filter(model %in% c("Ridge")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Ridge") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS6_true_vs_preds_Ridge.png")
+```
+
+```{r}
+DS6 %>% filter(model %in% c("LR")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("LR") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS6_true_vs_preds_LR.png")
+```
+
+```{r}
+DS6 %>% filter(model %in% c("RF")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RF") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS6_true_vs_preds_RF.png")
+```
+
+```{r}
+DS6 %>% filter(model %in% c("RT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS6_true_vs_preds_RT.png")
+```
+
+```{r}
+DS6 %>% filter(model %in% c("ERT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("ERT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS6_true_vs_preds_ERT.png")
+```
+
+
+
+
+### DS7
+
+```{r}
+DS7 <- DS7_preds %>% select(y_test, ends_with("preds")) %>%
+  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+  melt(id.vars = 'y_test', variable.name = "model")
+head(DS7)
+```
+
+```{r}
+DS7 %>% filter(model %in% c("NN")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("NN") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS7_true_vs_preds_NN.png")
+```
+
+```{r}
+DS7 %>% filter(model %in% c("Lasso")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Lasso") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS7_true_vs_preds_Lasso.png")
+```
+
+```{r}
+DS7 %>% filter(model %in% c("Ridge")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Ridge") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS7_true_vs_preds_Ridge.png")
+```
+
+```{r}
+DS7 %>% filter(model %in% c("LR")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("LR") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS7_true_vs_preds_LR.png")
+```
+
+```{r}
+DS7 %>% filter(model %in% c("RF")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RF") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS7_true_vs_preds_RF.png")
+```
+
+```{r}
+DS7 %>% filter(model %in% c("RT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS7_true_vs_preds_RT.png")
+```
+
+```{r}
+DS7 %>% filter(model %in% c("ERT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("ERT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS7_true_vs_preds_ERT.png")
+```
+
+
+
+
+## DS8
+
+```{r}
+DS8 <- DS8_preds %>% select(y_test, ends_with("preds")) %>%
+  rename(RF = "RF preds", RT = "DT preds", RF = "RF preds", NN = "NN preds",
+         Lasso = "Lasso preds", Ridge = "Ridge preds", ERT = "ERT preds", LR = "LR preds") %>%
+  melt(id.vars = 'y_test', variable.name = "model")
+head(DS8)
+```
+
+
+```{r}
+DS8 %>% filter(model %in% c("NN")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("NN") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS8_true_vs_preds_NN.png")
+```
+
+```{r}
+DS8 %>% filter(model %in% c("Lasso")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Lasso") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS8_true_vs_preds_Lasso.png")
+```
+
+```{r}
+DS8 %>% filter(model %in% c("Ridge")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("Ridge") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS8_true_vs_preds_Ridge.png")
+```
+
+```{r}
+DS8 %>% filter(model %in% c("LR")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("LR") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS8_true_vs_preds_LR.png")
+```
+
+```{r}
+DS8 %>% filter(model %in% c("RF")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RF") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS8_true_vs_preds_RF.png")
+```
+
+```{r}
+DS8 %>% filter(model %in% c("RT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("RT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS8_true_vs_preds_RT.png")
+```
+
+```{r}
+DS8 %>% filter(model %in% c("ERT")) %>% 
+  ggplot(aes(value, y_test, alpha = .5)) +
+  geom_point() +
+  geom_abline(col = "red") + 
+  ggtitle("ERT") +
+  ylab("True grade") + 
+  xlab("Predicted grade") +
+  theme_apa() +
+  theme(legend.position = "none") 
+#ggsave("new_pred_plot/DS8_true_vs_preds_ERT.png")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
