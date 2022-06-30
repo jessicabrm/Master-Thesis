@@ -1,7 +1,8 @@
 # Master-Thesis: Automatic Thesis Grading: Predicting the Grades of Bachelor's and Master's Theses 
 
 
-Abstract
+## Abstract
+
 Teachers evaluate essays manually, which is time-consuming and results in only a
 handful of opportunities for students to practice their writing skills. Over the past 50 years,
 researchers developed several automatic essay grading (AEG) systems for short essay texts.
