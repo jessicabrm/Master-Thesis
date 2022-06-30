@@ -1,0 +1,433 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+#install.packages("jtools")
+#install.packages(("patchwork"))
+```
+
+
+```{r}
+library(readxl)
+library(ggplot2)
+library(dplyr)
+library(ggrepel)
+library(jtools)
+library(tidyverse)
+library(cowplot)
+```
+
+
+```{r}
+theses_feature_groups = read_excel("theses_feature_groups.xlsx")
+thesis_data_all_lasso_coefficients = read_excel("results/thesis_data_all_lasso_coefficients.xlsx")
+DS1_all_lasso_coefficients = read_excel("results/DS1_all_lasso_coefficients.xlsx")
+DS2_all_lasso_coefficients = read_excel("results/DS2_all_lasso_coefficients.xlsx")
+DS2_2_all_lasso_coefficients = read_excel("results/DS2_2_all_lasso_coefficients.xlsx")
+DS3_all_lasso_coefficients = read_excel("results/DS3_all_lasso_coefficients.xlsx")
+DS4_all_lasso_coefficients = read_excel("results/DS4_all_lasso_coefficients.xlsx")
+DS5_all_lasso_coefficients = read_excel("results/DS5_all_lasso_coefficients.xlsx")
+DS6_all_lasso_coefficients = read_excel("results/DS6_all_lasso_coefficients.xlsx")
+DS7_all_lasso_coefficients = read_excel("results/DS7_all_lasso_coefficients.xlsx")
+DS8_all_lasso_coefficients = read_excel("results/DS8_all_lasso_coefficients.xlsx")
+DS8_all_lasso_coefficients 
+```
+
+```{r}
+all_coefs_data <- bind_cols(thesis_data_all_lasso_coefficients, DS1_all_lasso_coefficients, 
+                            DS2_all_lasso_coefficients, DS2_2_all_lasso_coefficients, 
+                            DS3_all_lasso_coefficients, DS4_all_lasso_coefficients, 
+                            DS5_all_lasso_coefficients, DS6_all_lasso_coefficients, 
+                            DS7_all_lasso_coefficients, DS8_all_lasso_coefficients) %>%
+  select(features...2, starts_with("coefficients")) %>%
+  
+  rename(features = features...2) %>%
+  rename(thesis_data_coefs = coefficients...3) %>%
+  rename(DS1_coefs = coefficients...6) %>%
+  rename(DS2A_coefs = coefficients...9) %>%
+  rename(DS2B_coefs = coefficients...12) %>%
+  rename(DS3_coefs = coefficients...15) %>%
+  rename(DS4_coefs = coefficients...18) %>%
+  rename(DS5_coefs = coefficients...21) %>%
+  rename(DS6_coefs = coefficients...24) %>%
+  rename(DS7_coefs = coefficients...27) %>%
+  rename(DS8_coefs = coefficients...30)
+
+all_coefs_data
+```
+
+```{r}
+coefs_data <- all_coefs_data %>% mutate(allDSsummed = all_coefs_data  %>% 
+           select(DS1_coefs, DS2A_coefs, DS2B_coefs, DS3_coefs, DS4_coefs, 
+                  DS5_coefs, DS6_coefs, DS7_coefs, DS8_coefs) %>% rowSums,
+           allDSsummed_scaled = allDSsummed / 9,
+         both1 = ifelse(thesis_data_coefs > 0 & DS1_coefs > 0, features,''),
+         both2A = ifelse(thesis_data_coefs > 0 & DS2A_coefs > 0, features,''), 
+         both2B = ifelse(thesis_data_coefs > 0 & DS2B_coefs > 0, features,''),
+         both3 = ifelse(thesis_data_coefs > 0 & DS3_coefs > 0, features,''),
+         both4 = ifelse(thesis_data_coefs > 0 & DS4_coefs > 0, features,''),
+         both5 = ifelse(thesis_data_coefs > 0 & DS5_coefs > 0, features,''),
+         both6 = ifelse(thesis_data_coefs > 0 & DS6_coefs > 0, features,''),
+         both7 = ifelse(thesis_data_coefs > 0 & DS7_coefs > 0, features,''),
+         both8 = ifelse(thesis_data_coefs > 0 & DS8_coefs > 0, features,''),
+         both_summed = ifelse(thesis_data_coefs > 0 & allDSsummed > 0, features,''),
+         both_summed_idx = ifelse(thesis_data_coefs > 0 & allDSsummed_scaled > 0, row_number(),''))
+coefs_data
+```
+
+
+
+
+
+```{r}
+essay_features = coefs_data %>% select(features, allDSsummed) %>% arrange(desc(allDSsummed))
+essay_features
+```
+
+
+```{r}
+theses_features = coefs_data %>% select(features, thesis_data_coefs) %>% arrange(desc(thesis_data_coefs))
+theses_features
+```
+
+
+
+```{r}
+#write.csv(theses_features,"theses_coefs.csv", row.names = FALSE)
+```
+
+```{r}
+#write.csv(essay_features,"essay_coefs.csv", row.names = FALSE)
+```
+
+
+
+```{r}
+nums <- coefs_data %>% select(features, allDSsummed_scaled, thesis_data_coefs, both_summed_idx) %>% filter(both_summed_idx == row_number()) %>% arrange(desc(thesis_data_coefs)) %>% mutate(no = row_number()) %>% 
+  merge(y = theses_feature_groups, by = "features") %>% 
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L))))
+nums
+```
+
+
+```{r}
+thesis_summed_lingu_plot <- nums %>%
+  ggplot(aes(allDSsummed_scaled, thesis_data_coefs)) +
+  geom_point(size = 3, alpha = .7, aes(colour = big_feature_group)) + 
+  geom_label_repel(aes(label = ifelse(big_feature_group == "Linguistic", features, ""), colour = big_feature_group), 
+                       max.overlaps = 100, box.padding = 1.5, size = 2.5, show.legend = F) +
+  geom_abline(alpha = .2) +
+  xlab("Hewlett datasets") + 
+  ylab("Thesis data") + 
+  xlim(0, .5) + 
+  theme_apa() +
+  theme(legend.position = "none")
+
+thesis_summed_lingu_plot
+#ggsave("thesis_DS_summed_coefs_Linguistic.png")
+```
+
+
+```{r}
+thesis_summed_content_plot <- nums %>%
+  ggplot(aes(allDSsummed_scaled, thesis_data_coefs)) +
+  geom_point(size = 3, alpha = .7, aes(colour = big_feature_group)) + 
+  geom_label_repel(aes(label = ifelse(big_feature_group == "Content", features, ""), 
+                       colour = big_feature_group), show.legend = F,
+                       max.overlaps = 100, box.padding = 1.5, size = 2.5) +
+  geom_abline(alpha = .2) +
+  xlab("Hewlett datasets") + 
+  ylab("Thesis data") + 
+  xlim(0, .5) + 
+  theme_apa() +
+  theme(legend.position = c(.85, .85))
+thesis_summed_content_plot
+#ggsave("thesis_DS_summed_coefs_Content.png")
+```
+
+```{r}
+thesis_summed_coherence_plot <- nums %>%
+  ggplot(aes(allDSsummed_scaled, thesis_data_coefs)) +
+  geom_point(size = 3, alpha = .7, aes(colour = big_feature_group)) + 
+  geom_label_repel(aes(label = ifelse(big_feature_group == "Coherence", features, ""),
+                       color = big_feature_group),  show.legend = F,
+                       max.overlaps = 100, box.padding = 1.5, size = 2.5) +
+  geom_abline(alpha = .2) +
+  xlab("Hewlett datasets") + 
+  ylab("Thesis data") + 
+  xlim(0, .5) + 
+  theme_apa() +
+  theme(legend.position = "none")
+
+thesis_summed_coherence_plot
+#ggsave("thesis_DS_summed_coefs_Coherence.png")
+```
+
+
+```{r}
+#write.csv(nums,"nums_coefs.csv", row.names = FALSE)
+```
+
+
+```{r}
+coefs_data %>% merge(y = theses_feature_groups, by = "features")
+```
+
+
+```{r}
+p1 <- coefs_data %>% 
+  merge(y = theses_feature_groups, by = "features") %>%
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L)))) %>%
+  ggplot(aes(DS1_coefs, thesis_data_coefs)) + 
+  geom_point(aes(colour = big_feature_group), alpha = .7) + 
+  geom_label_repel(aes(label = both1, color = big_feature_group), max.overlaps = 90, box.padding = .8, size = 2, 
+                   show.legend = F) + 
+  xlab("DS1") + 
+  ylab("Theses") + 
+  geom_abline(alpha = .2) +
+  theme_apa() +
+  theme(legend.position = c(.85, .85))
+
+p1
+#ggsave("DS1_coefs.png")
+```
+
+
+```{r}
+p2A <- coefs_data %>% 
+  merge(y = theses_feature_groups, by = "features") %>%
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L)))) %>%
+  ggplot(aes(DS2A_coefs, thesis_data_coefs)) + 
+  geom_point(aes(colour = big_feature_group), alpha = .7) + 
+  geom_label_repel(aes(label = both2A, color = big_feature_group), max.overlaps = 80, box.padding = 1.5, size = 2, 
+                   show.legend = F) + 
+  xlab("DS2A") + 
+  ylab("Theses") + 
+  scale_y_continuous(expand = expand_scale(mult = c(0.2, .05))) +
+  xlim(0, 0.15) + 
+  ylim(0, 0.15) + 
+  geom_abline(alpha = .2) + 
+  theme_apa() +
+  theme(legend.position = c(.85, .85))
+  
+p2A
+#ggsave("DS2A_coefs.png")
+```
+
+```{r}
+p2B <- coefs_data %>% 
+  merge(y = theses_feature_groups, by = "features") %>%
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L)))) %>%
+  ggplot(aes(DS2B_coefs, thesis_data_coefs)) + 
+  geom_point(aes(colour = big_feature_group), alpha = .7) + 
+  geom_label_repel(aes(label = both2B, color = big_feature_group), max.overlaps = 80, box.padding = 1.5, 
+                   size = 2, show.legend = F) + 
+  xlab("DS2B") + 
+  ylab("Theses") + 
+  xlim(0, 0.15) + 
+  ylim(0, 0.15) + 
+  geom_abline(alpha = .2) +
+  theme_apa() +
+  theme(legend.position = c(.85, .85))
+p2B
+
+#ggsave("DS2B_coefs.png")
+```
+
+```{r}
+p3 <- coefs_data %>% 
+  merge(y = theses_feature_groups, by = "features") %>%
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L)))) %>%
+  ggplot(aes(DS3_coefs, thesis_data_coefs)) + 
+  geom_point(aes(colour = big_feature_group), alpha = .7) + 
+  geom_label_repel(aes(label = both3, color = big_feature_group), max.overlaps = 80, box.padding = 2.5, size = 2, 
+                   show.legend = F) + 
+  xlab("DS3") + 
+  ylab("Theses") + 
+  xlim(0, 0.15) + 
+  ylim(0, 0.15) + 
+  geom_abline(alpha = .2) +
+  theme_apa() +
+  theme(legend.position = c(.85, .85))
+p3
+#ggsave("DS3_coefs.png")
+```
+
+
+```{r}
+p4 <- coefs_data %>% 
+  merge(y = theses_feature_groups, by = "features") %>%
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L)))) %>%
+  ggplot(aes(DS4_coefs, thesis_data_coefs)) + 
+  geom_point(aes(colour = big_feature_group), alpha = .7) + 
+  geom_label_repel(aes(label = both4, color = big_feature_group), max.overlaps = 90, box.padding = 1.4, size = 2, 
+                   show.legend = F) + 
+  xlab("DS4") + 
+  ylab("Theses") + 
+  xlim(0, 0.25) + 
+  ylim(0, 0.25) + 
+  geom_abline(alpha = .2) +
+  theme_apa() + 
+  theme(legend.position = "none") +
+  theme(legend.position = c(.85, .85))
+p4
+#ggsave("DS4_coefs.png")
+```
+
+```{r}
+p5 <- coefs_data %>% 
+  merge(y = theses_feature_groups, by = "features") %>%
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L)))) %>%
+  ggplot(aes(DS5_coefs, thesis_data_coefs)) + 
+  geom_point(aes(colour = big_feature_group), alpha = .7) + 
+  geom_label_repel(aes(label = both5, color = big_feature_group), max.overlaps = 90, box.padding = .5, size = 1.9,
+                   show.legend = F) + 
+  xlab("DS5") + 
+  ylab("Theses") + 
+  geom_abline(alpha = .2) +
+  theme_apa() +
+  theme(legend.position = c(.85, .85))
+p5
+#ggsave("DS5_coefs.png")
+```
+
+```{r}
+p6 <- coefs_data %>% 
+  merge(y = theses_feature_groups, by = "features") %>%
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L)))) %>%
+  ggplot(aes(DS6_coefs, thesis_data_coefs)) + 
+  geom_point(aes(colour = big_feature_group), alpha = .7) + 
+  geom_label_repel(aes(label = both6, color = big_feature_group), max.overlaps = 80, box.padding = .8, size = 2, 
+                   show.legend = F) + 
+  xlab("DS6") + 
+  ylab("Theses") + 
+  xlim(0, 0.2) + 
+  ylim(0, 0.2) + 
+  geom_abline(alpha = .2) +
+  theme_apa() + 
+  theme(legend.position = c(.85, .85))
+p6
+#ggsave("DS6_coefs.png")
+```
+
+```{r}
+p7 <- coefs_data %>% 
+  merge(y = theses_feature_groups, by = "features") %>%
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L)))) %>%
+  ggplot(aes(DS7_coefs, thesis_data_coefs)) + 
+  geom_point(aes(colour = big_feature_group), alpha = .7) + 
+  geom_label_repel(aes(label = both7, color = big_feature_group), max.overlaps = 90, box.padding = 1, size = 2,
+                   show.legend = F) + 
+  xlab("DS7") + 
+  ylab("Theses") +
+  xlim(0, 1.8) + 
+  ylim(0, 1.8) + 
+  geom_abline(alpha = .2) +
+  theme_apa() +
+  theme(legend.position = c(.85, .85))
+p7
+#ggsave("DS7_coefs.png")
+```
+
+```{r}
+p8 <- coefs_data %>% 
+  merge(y = theses_feature_groups, by = "features") %>%
+  mutate(big_feature_group = ifelse(feature_group %in% c("LS", "RM", "LD", "G", "POS", "M"), "Linguistic", 
+                                    ifelse(feature_group == "C", "Content", 
+                                           ifelse(feature_group %in% c("BC", "SA", "SDA"), "Coherence",
+                                                                       ""))),
+         nr_big_feature_group = ifelse(big_feature_group == "Linguistic", 1L,  
+                                    ifelse(big_feature_group == "Content", 2L,
+                                           ifelse(big_feature_group =="Coherence",3L,
+                                                                       0L)))) %>%
+  ggplot(aes(DS8_coefs, thesis_data_coefs)) + 
+  geom_label_repel(aes(label = both8, color = big_feature_group), max.overlaps = 90, box.padding = 1.3, show.legend = F,
+                   size = 2) +
+  geom_point(aes(colour = big_feature_group), alpha = .7) + 
+  xlab("DS8") + 
+  ylab("Theses") + 
+  xlim(0, 2.5) + 
+  ylim(0, 2.5) + 
+  geom_abline(alpha = .2) +
+  theme_apa() +
+  theme(legend.position = c(.85, .85))
+
+p8
+#ggsave("DS8_coefs.png")
+```
+
+
+
+
+
+
+
+
+
